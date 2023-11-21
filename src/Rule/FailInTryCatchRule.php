@@ -66,7 +66,7 @@ class FailInTryCatchRule implements Rule
         if (!$node instanceof Expression) {
             return false;
         }
-        if (!$node->expr instanceof MethodCall) {
+        if (!$node->expr instanceof MethodCall && !$node->expr instanceof Node\Expr\StaticCall) {
             return false;
         }
 

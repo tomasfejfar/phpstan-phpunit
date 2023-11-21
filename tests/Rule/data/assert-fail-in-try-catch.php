@@ -2,10 +2,7 @@
 
 namespace PHPStan\Rules\PHPUnit;
 
-use PHPStan\Rules\Rule;
-use PHPStan\Testing\RuleTestCase;
 use PHPUnit\Framework\TestCase;
-use Tomasfejfar\PhpstanPhpunit\Rule\FailInTryCatchRule;
 
 class DummyTest extends TestCase
 {
@@ -23,6 +20,14 @@ class DummyTest extends TestCase
             $this->doSomething();
             // will not fail here
             $this->fail();
+        } catch (\Exception $e) {
+            $this->assertEquals('foo', $e->getMessage());
+        }
+
+        try {
+            $this->doSomething();
+            // will not fail here
+            self::fail();
         } catch (\Exception $e) {
             $this->assertEquals('foo', $e->getMessage());
         }
