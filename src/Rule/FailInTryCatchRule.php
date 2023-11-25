@@ -72,7 +72,7 @@ class FailInTryCatchRule implements Rule
 
         $expression = $node->expr;
 
-        if (!$expression->name === 'fail') {
+        if (!($expression->name->toString() === 'fail')) {
             return false;
         }
         return true;
