@@ -1,0 +1,27 @@
+{
+    "name": "tomasfejfar/phpstan-phpunit",
+    "type": "phpstan-plugin",
+    "require": {
+        "phpstan/phpstan": "^1.10"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.4"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Tomasfejfar\\PhpstanPhpunit\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tomasfejfar\\PhpstanPhpunit\\Test": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Tomáš Fejfar",
+            "email": "tomas.fejfar@gmail.com"
+        }
+    ]
+}
