@@ -33,28 +33,28 @@ class DummyTest extends TestCase
         }
 
         try {
+            // @phpstan-ignore: tomasfejfar-phpstan-phpunit.missingFailInTryCatch
             $this->doSomething();
-            // tomasfejfar/phpstan-phpunit:ignore-missing-fail
         } catch (\Exception $e) {
             $this->assertEquals('foo', $e->getMessage());
         }
 
         try {
+            //     @phpstan-ignore: tomasfejfar-phpstan-phpunit.missingFailInTryCatch
             $this->doSomething();
-            //     tomasfejfar/phpstan-phpunit:ignore-missing-fail
         } catch (\Exception $e) {
             $this->assertEquals('foo', $e->getMessage());
         }
 
         try {
+            //@phpstan-ignore: tomasfejfar-phpstan-phpunit.missingFailInTryCatch
             $this->doSomething();
-            //tomasfejfar/phpstan-phpunit:ignore-missing-fail
         } catch (\Exception $e) {
             $this->assertEquals('foo', $e->getMessage());
         }
         try {
+            // @phpstan-ignore: tomasfejfar-phpstan-phpunit.missingFailInTryCatch because of some reason
             $this->doSomething();
-            // tomasfejfar/phpstan-phpunit:ignore-missing-fail because of some reason
         } catch (\Exception $e) {
             $this->assertEquals('foo', $e->getMessage());
         }

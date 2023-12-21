@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace Tomasfejfar\PhpstanPhpunit\Rule;
 
-use PhpParser\Comment;
 use PhpParser\Node;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -14,7 +13,6 @@ use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleError;
 use PHPStan\Rules\RuleErrorBuilder;
-use function PHPUnit\Framework\stringStartsWith;
 
 class FailInTryCatchRule implements Rule
 {
@@ -52,13 +50,13 @@ class FailInTryCatchRule implements Rule
                 if (
                     $lastTryStmt !== false
                     && !$this->isFailMethodCall($lastTryStmt, $scope)
-                    && !$this->isIgnoreComment($lastTryStmt, $scope)
+                    && !$this->hasIgnoreComment($lastTryStmt, $scope)
                 ) {
                     $errors[] =	RuleErrorBuilder::message(
-                        'You should always add `$this->fail()` as a last statement in try/catch block (ignore by `tomasfejfar/phpstan-phpunit:ignore-missing-fail` comment).'
+                        'You should always add `$this->fail()` as a last statement in try/catch block.'
                     )
                         ->line($lastTryStmt->getLine())
-                            ->identifier('tomasfejfar-phpstanPhpunit.tryCatch.fail')
+                            ->identifier('tomasfejfar-phpstan-phpunit.missingFailInTryCatch')
                             ->build();
                 }
             }
@@ -83,15 +81,13 @@ class FailInTryCatchRule implements Rule
         return true;
     }
 
-    private function isIgnoreComment(\PhpParser\Node $node, Scope $scope): bool
+    private function hasIgnoreComment(\PhpParser\Node $node, Scope $scope): bool
     {
-        if (!$node instanceof Node\Stmt\Nop) {
-            return false;
-        }
         $comments = $node->getComments();
         $lastComment = end($comments);
         $lastCommentText = $lastComment->getText();
 
-        return preg_match('|//\s*tomasfejfar/phpstan-phpunit:ignore-missing-fail|', $lastCommentText) === 1;
+        return preg_match('|@phpstan-ignore: *tomasfejfar-phpstan-phpunit.missingFailInTryCatch|', $lastCommentText)
+            === 1;
     }
 }
