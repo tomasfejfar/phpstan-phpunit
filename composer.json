@@ -15,7 +15,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tomasfejfar\\PhpstanPhpunit\\Test": "tests/"
+            "Tomasfejfar\\PhpstanPhpunit\\Test\\": "tests/"
         }
     },
     "authors": [
@@ -23,5 +23,9 @@
             "name": "Tomáš Fejfar",
             "email": "tomas.fejfar@gmail.com"
         }
-    ]
+    ],
+    "config": {
+        "lock": false,
+        "sort-packages": true
+    }
 }
