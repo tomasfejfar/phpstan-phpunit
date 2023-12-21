@@ -13,7 +13,6 @@ use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleError;
 use PHPStan\Rules\RuleErrorBuilder;
-use function PHPUnit\Framework\stringStartsWith;
 
 class FailInTryCatchRule implements Rule
 {
@@ -48,12 +47,16 @@ class FailInTryCatchRule implements Rule
                 $lastTryStmt = end($stmt->stmts);
 
                 // Ensure that the last statement in the "try" block is a call to $this->fail()
-                if ($lastTryStmt !== false && !$this->isFailMethodCall($lastTryStmt, $scope)) {
+                if (
+                    $lastTryStmt !== false
+                    && !$this->isFailMethodCall($lastTryStmt, $scope)
+                    && !$this->hasIgnoreComment($lastTryStmt, $scope)
+                ) {
                     $errors[] =	RuleErrorBuilder::message(
                         'You should always add `$this->fail()` as a last statement in try/catch block.'
                     )
                         ->line($lastTryStmt->getLine())
-                            ->identifier('phpunit.tryCatch.fail')
+                            ->identifier('tomasfejfar-phpstan-phpunit.missingFailInTryCatch')
                             ->build();
                 }
             }
@@ -76,5 +79,15 @@ class FailInTryCatchRule implements Rule
             return false;
         }
         return true;
+    }
+
+    private function hasIgnoreComment(\PhpParser\Node $node, Scope $scope): bool
+    {
+        $comments = $node->getComments();
+        $lastComment = end($comments);
+        $lastCommentText = $lastComment->getText();
+
+        return preg_match('|@phpstan-ignore: *tomasfejfar-phpstan-phpunit.missingFailInTryCatch|', $lastCommentText)
+            === 1;
     }
 }

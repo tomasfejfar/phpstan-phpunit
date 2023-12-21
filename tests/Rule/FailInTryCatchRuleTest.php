@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace Tomasfejfar\PhpstanPhpunit\Tests\Rule;
+namespace Tomasfejfar\PhpstanPhpunit\Test\Rule;
 
 use PHPStan\Rules\Rule;
 use PHPStan\Testing\RuleTestCase;
