@@ -1,6 +1,7 @@
 {
     "name": "tomasfejfar/phpstan-phpunit",
     "type": "phpstan-plugin",
+    "description": "Collection of phpstan rules for phpunit",
     "require": {
         "phpstan/phpstan": "^1.10"
     },
@@ -24,6 +25,13 @@
             "email": "tomas.fejfar@gmail.com"
         }
     ],
+    "scripts": {
+        "build": [
+            "@composer validate --strict",
+            "@test"
+        ],
+        "test": "phpunit"
+    },
     "config": {
         "lock": false,
         "sort-packages": true
