@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace Tomasfejfar\PhpstanPhpunit\Tests\Rule;
+namespace Tomasfejfar\PhpstanPhpunit\Test\Rule;
 
 use PHPStan\Rules\Rule;
 use PHPStan\Testing\RuleTestCase;
@@ -15,7 +15,7 @@ class FailInTryCatchRuleTest extends RuleTestCase
     {
         $this->analyse([__DIR__ . '/data/assert-fail-in-try-catch.php'], [
             [
-                'You should always add `$this->fail()` as a last statement in try/catch block.',
+                'You should always add `$this->fail()` as a last statement in try/catch block (ignore by `tomasfejfar/phpstan-phpunit:ignore-missing-fail` comment).',
                 14,
             ],
         ]);

@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Tomasfejfar\PhpstanPhpunit\Rule;
 
+use PhpParser\Comment;
 use PhpParser\Node;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -48,12 +49,16 @@ class FailInTryCatchRule implements Rule
                 $lastTryStmt = end($stmt->stmts);
 
                 // Ensure that the last statement in the "try" block is a call to $this->fail()
-                if ($lastTryStmt !== false && !$this->isFailMethodCall($lastTryStmt, $scope)) {
+                if (
+                    $lastTryStmt !== false
+                    && !$this->isFailMethodCall($lastTryStmt, $scope)
+                    && !$this->isIgnoreComment($lastTryStmt, $scope)
+                ) {
                     $errors[] =	RuleErrorBuilder::message(
-                        'You should always add `$this->fail()` as a last statement in try/catch block.'
+                        'You should always add `$this->fail()` as a last statement in try/catch block (ignore by `tomasfejfar/phpstan-phpunit:ignore-missing-fail` comment).'
                     )
                         ->line($lastTryStmt->getLine())
-                            ->identifier('phpunit.tryCatch.fail')
+                            ->identifier('tomasfejfar-phpstanPhpunit.tryCatch.fail')
                             ->build();
                 }
             }
@@ -76,5 +81,17 @@ class FailInTryCatchRule implements Rule
             return false;
         }
         return true;
+    }
+
+    private function isIgnoreComment(\PhpParser\Node $node, Scope $scope): bool
+    {
+        if (!$node instanceof Node\Stmt\Nop) {
+            return false;
+        }
+        $comments = $node->getComments();
+        $lastComment = end($comments);
+        $lastCommentText = $lastComment->getText();
+
+        return preg_match('|//\s*tomasfejfar/phpstan-phpunit:ignore-missing-fail|', $lastCommentText) === 1;
     }
 }
