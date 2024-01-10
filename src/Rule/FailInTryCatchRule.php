@@ -84,6 +84,9 @@ class FailInTryCatchRule implements Rule
     private function hasIgnoreComment(\PhpParser\Node $node, Scope $scope): bool
     {
         $comments = $node->getComments();
+        if (count($comments) === 0) {
+            return false;
+        }
         $lastComment = end($comments);
         $lastCommentText = $lastComment->getText();
 

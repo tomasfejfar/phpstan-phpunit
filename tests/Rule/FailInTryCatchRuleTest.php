@@ -18,6 +18,10 @@ class FailInTryCatchRuleTest extends RuleTestCase
                 'You should always add `$this->fail()` as a last statement in try/catch block.',
                 14,
             ],
+            [
+                'You should always add `$this->fail()` as a last statement in try/catch block.',
+                66,
+            ],
         ]);
     }
 

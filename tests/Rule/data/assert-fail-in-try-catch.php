@@ -60,6 +60,18 @@ class DummyTest extends TestCase
         }
 
 
+        // exception should be thrown, as quantity has empty value '' and snflk will complain.
+        try {
+            $workspaces->loadWorkspaceData($workspace['id'], $options);
+            if ($workspaceBackend === self::BACKEND_REDSHIFT && $sourceBackend === self::BACKEND_SNOWFLAKE) {
+                // this will not throw
+                $this->expectNotToPerformAssertions();
+            } else {
+                $this->fail('Should have thrown');
+            }
+        } catch (ClientException $e) {
+            $this->assertEquals('workspace.tableLoad', $e->getStringCode());
+        }
     }
 
     private function doSomething()
