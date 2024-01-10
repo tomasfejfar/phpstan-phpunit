@@ -87,7 +87,7 @@ class FailInTryCatchRule implements Rule
             === 1;
     }
 
-    public function isFailOrIgnore(mixed $lastTryStmt, Scope $scope): array
+    public function isFailOrIgnore($lastTryStmt, Scope $scope): array
     {
         $errors = [];
         if (
@@ -104,7 +104,7 @@ class FailInTryCatchRule implements Rule
         return $errors;
     }
 
-    public function checkLastStatement(mixed $lastTryStmt, Scope $scope): array
+    public function checkLastStatement($lastTryStmt, Scope $scope): array
     {
         $errors = [];
         if ($lastTryStmt instanceof Node\Stmt\If_) {
