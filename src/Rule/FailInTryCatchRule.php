@@ -48,17 +48,27 @@ class FailInTryCatchRule implements Rule
 
                 // Ensure that the last statement in the "try" block is a call to $this->fail()
                 if (
-                    $lastTryStmt !== false
-                    && !$this->isFailMethodCall($lastTryStmt, $scope)
-                    && !$this->hasIgnoreComment($lastTryStmt, $scope)
+                    $lastTryStmt === false
                 ) {
-                    $errors[] =	RuleErrorBuilder::message(
-                        'You should always add `$this->fail()` as a last statement in try/catch block.'
-                    )
-                        ->line($lastTryStmt->getLine())
-                            ->identifier('tomasfejfar-phpstan-phpunit.missingFailInTryCatch')
-                            ->build();
+                    continue;
                 }
+                if ($lastTryStmt instanceof Node\Stmt\If_) {
+                    $if = $lastTryStmt;
+                    $lastTryStmt = end($lastTryStmt->stmts);
+                    $errors = array_merge($errors, $this->isFailOrIgnore($lastTryStmt, $scope));
+                    if ($if->else) {
+                        $lastTryStmt = end($if->else->stmts);
+                        $errors = array_merge($errors, $this->isFailOrIgnore($lastTryStmt, $scope));
+                    }
+                    if ($if->elseifs) {
+                        foreach ($if->elseifs as $elseif) {
+                            $lastTryStmt = end($elseif->stmts);
+                            $errors = array_merge($errors, $this->isFailOrIgnore($lastTryStmt, $scope));
+                        }
+                    }
+                    continue;
+                }
+                $errors = array_merge($errors, $this->isFailOrIgnore($lastTryStmt, $scope));
             }
         }
         return $errors;
@@ -92,5 +102,22 @@ class FailInTryCatchRule implements Rule
 
         return preg_match('|@phpstan-ignore: *tomasfejfar-phpstan-phpunit.missingFailInTryCatch|', $lastCommentText)
             === 1;
+    }
+
+    public function isFailOrIgnore(mixed $lastTryStmt, Scope $scope): array
+    {
+        $errors = [];
+        if (
+            !$this->isFailMethodCall($lastTryStmt, $scope)
+            && !$this->hasIgnoreComment($lastTryStmt, $scope)
+        ) {
+            $errors[] = RuleErrorBuilder::message(
+                'You should always add `$this->fail()` as a last statement in try/catch block.'
+            )
+                ->line($lastTryStmt->getLine())
+                ->identifier('tomasfejfar-phpstan-phpunit.missingFailInTryCatch')
+                ->build();
+        }
+        return $errors;
     }
 }
