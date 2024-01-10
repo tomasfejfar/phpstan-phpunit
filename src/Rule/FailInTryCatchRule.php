@@ -46,29 +46,12 @@ class FailInTryCatchRule implements Rule
             if ($stmt instanceof TryCatch) {
                 $lastTryStmt = end($stmt->stmts);
 
-                // Ensure that the last statement in the "try" block is a call to $this->fail()
                 if (
                     $lastTryStmt === false
                 ) {
                     continue;
                 }
-                if ($lastTryStmt instanceof Node\Stmt\If_) {
-                    $if = $lastTryStmt;
-                    $lastTryStmt = end($lastTryStmt->stmts);
-                    $errors = array_merge($errors, $this->isFailOrIgnore($lastTryStmt, $scope));
-                    if ($if->else) {
-                        $lastTryStmt = end($if->else->stmts);
-                        $errors = array_merge($errors, $this->isFailOrIgnore($lastTryStmt, $scope));
-                    }
-                    if ($if->elseifs) {
-                        foreach ($if->elseifs as $elseif) {
-                            $lastTryStmt = end($elseif->stmts);
-                            $errors = array_merge($errors, $this->isFailOrIgnore($lastTryStmt, $scope));
-                        }
-                    }
-                    continue;
-                }
-                $errors = array_merge($errors, $this->isFailOrIgnore($lastTryStmt, $scope));
+                $errors = array_merge($errors, $this->checkLastStatement($lastTryStmt, $scope));
             }
         }
         return $errors;
@@ -118,6 +101,52 @@ class FailInTryCatchRule implements Rule
                 ->identifier('tomasfejfar-phpstan-phpunit.missingFailInTryCatch')
                 ->build();
         }
+        return $errors;
+    }
+
+    public function checkLastStatement(mixed $lastTryStmt, Scope $scope): array
+    {
+        $errors = [];
+        if ($lastTryStmt instanceof Node\Stmt\If_) {
+            $if = $lastTryStmt;
+            $lastTryStmt = end($if->stmts);
+            if ($lastTryStmt) {
+                $errors = array_merge($errors, $this->checkLastStatement($lastTryStmt, $scope));
+            }
+            if ($if->else) {
+                $lastTryStmt = end($if->else->stmts);
+                if ($lastTryStmt) {
+                    $errors = array_merge($errors, $this->checkLastStatement($lastTryStmt, $scope));
+                }
+            }
+            if ($if->elseifs) {
+                foreach ($if->elseifs as $elseif) {
+                    $lastTryStmt = end($elseif->stmts);
+                    if ($lastTryStmt) {
+                        $errors = array_merge($errors, $this->checkLastStatement($lastTryStmt, $scope));
+                    }
+                }
+            }
+            return $errors;
+        }
+
+        if ($lastTryStmt instanceof Node\Stmt\For_ || $lastTryStmt instanceof Node\Stmt\Foreach_ || $lastTryStmt
+            instanceof Node\Stmt\While_ || $lastTryStmt instanceof Node\Stmt\Do_) {
+            $lastTryStmt = end($lastTryStmt->stmts);
+            if ($lastTryStmt) {
+                $errors = array_merge($errors, $this->checkLastStatement($lastTryStmt, $scope));
+            }
+            return $errors;
+        }
+        if ($lastTryStmt instanceof Node\Stmt\Switch_) {
+            foreach ($lastTryStmt->cases as $case) {
+                $lastTryStmt = end($case->stmts);
+                if ($lastTryStmt) {
+                    $errors = array_merge($errors, $this->checkLastStatement($lastTryStmt, $scope));
+                }
+            }
+        }
+        $errors = array_merge($errors, $this->isFailOrIgnore($lastTryStmt, $scope));
         return $errors;
     }
 }
