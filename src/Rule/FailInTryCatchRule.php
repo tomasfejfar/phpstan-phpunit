@@ -74,31 +74,15 @@ class FailInTryCatchRule implements Rule
         return true;
     }
 
-    private function hasIgnoreComment(\PhpParser\Node $node, Scope $scope): bool
-    {
-        $comments = $node->getComments();
-        if (count($comments) === 0) {
-            return false;
-        }
-        $lastComment = end($comments);
-        $lastCommentText = $lastComment->getText();
-
-        return preg_match('|@phpstan-ignore: *tomasfejfar-phpstan-phpunit.missingFailInTryCatch|', $lastCommentText)
-            === 1;
-    }
-
     public function isFailOrIgnore($lastTryStmt, Scope $scope): array
     {
         $errors = [];
-        if (
-            !$this->isFailMethodCall($lastTryStmt, $scope)
-            && !$this->hasIgnoreComment($lastTryStmt, $scope)
-        ) {
+        if (!$this->isFailMethodCall($lastTryStmt, $scope)) {
             $errors[] = RuleErrorBuilder::message(
                 'You should always add `$this->fail()` as a last statement in try/catch block.'
             )
                 ->line($lastTryStmt->getLine())
-                ->identifier('tomasfejfar-phpstan-phpunit.missingFailInTryCatch')
+                ->identifier('tomasfejfar.phpstanPhpunit.missingFailInTryCatch')
                 ->build();
         }
         return $errors;
