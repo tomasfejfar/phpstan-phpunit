@@ -83,7 +83,7 @@ class FailInTryCatchRule implements Rule
         $lastComment = end($comments);
         $lastCommentText = $lastComment->getText();
 
-        return preg_match('|@phpstan-ignore: *tomasfejfar-phpstan-phpunit.missingFailInTryCatch|', $lastCommentText)
+        return preg_match('|@phpstan-ignore *tomasfejfar.phpstanPhpunit.missingFailInTryCatch|', $lastCommentText)
             === 1;
     }
 
@@ -98,7 +98,7 @@ class FailInTryCatchRule implements Rule
                 'You should always add `$this->fail()` as a last statement in try/catch block.'
             )
                 ->line($lastTryStmt->getLine())
-                ->identifier('tomasfejfar-phpstan-phpunit.missingFailInTryCatch')
+                ->identifier('tomasfejfar.phpstanPhpunit.missingFailInTryCatch')
                 ->build();
         }
         return $errors;
